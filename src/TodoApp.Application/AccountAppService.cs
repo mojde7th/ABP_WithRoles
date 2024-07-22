@@ -65,7 +65,7 @@ namespace TodoApp.Application
                     HttpOnly = true
                 };
                 
-               context.Response.Cookies.Append(".AspNetCore.Identity.Application", "", options);
+              context.Response.Cookies.Append(".AspNetCore.Identity.Application", "", options);
                 return token;
                 
             }

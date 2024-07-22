@@ -17,14 +17,18 @@ namespace TodoApp
         {
             _accountAppService = accountAppService;
         }
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login
-            ([FromBody] LoginDto model)
+        [HttpGet("Login")]
+        public IActionResult Login()
         {
-            var token = await _accountAppService.
-                LoginAsync(model);
-            return Ok(new {token});
+            // Redirect to the React application's login page
+            return Redirect("http://localhost:3000/login");
         }
 
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto input)
+        {
+            var token = await _accountAppService.LoginAsync(input);
+            return Ok(new { token });
+        }
     }
 }
