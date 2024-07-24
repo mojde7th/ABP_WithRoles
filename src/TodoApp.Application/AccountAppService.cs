@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +15,9 @@ using TodoApp.Application.Contracts;
 using Volo.Abp.Account;
 using Volo.Abp.Identity;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
- 
+using IdentityRole = Volo.Abp.Identity.IdentityRole;
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace TodoApp.Application
 {
     public class AccountAppService:IAccountAppService
@@ -24,17 +27,21 @@ namespace TodoApp.Application
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountAppService> _logger;
         private readonly IHttpContextAccessor _contextAccessor;
-
-        public AccountAppService(UserManager<IdentityUser> userManager, 
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AccountAppService(UserManager<IdentityUser>
+            userManager, 
             SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration, ILogger<AccountAppService> logger, 
-            IHttpContextAccessor contextAccessor)
+            IConfiguration configuration,
+            ILogger<AccountAppService> logger,
+            IHttpContextAccessor contextAccessor,
+           RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _logger = logger;
-            _contextAccessor = contextAccessor;
+           _contextAccessor = contextAccessor;
+          _roleManager = roleManager;
         }
 
         public async Task<string> LoginAsync(LoginDto input)
@@ -94,5 +101,39 @@ namespace TodoApp.Application
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public async Task<bool> CreateRoleAsync
+            (string roleName)
+        {
+            var roleExists = await _roleManager.
+                RoleExistsAsync(roleName);
+            if (!roleExists)
+            {
+                var newRole = new IdentityRole(Guid.NewGuid(), roleName, null);
+                var roleResult = await _roleManager.CreateAsync
+                    (newRole);
+
+                return roleResult.Succeeded;
+            }
+            return false;
+        }
+
+        public async Task<bool> AssignRoleAsync
+            (string username, string roleName)
+        {
+            var user = await _userManager.
+                FindByNameAsync(username);
+            if (user != null)
+            {
+                var result = await _userManager.AddToRoleAsync
+                        (user, roleName);
+                return result.Succeeded;
+            }
+            return false;
+        }
+
+
     }
-}
+            
+            
+            }
+

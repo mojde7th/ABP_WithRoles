@@ -47,6 +47,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Account;
 using AccountAppService = TodoApp.Application.AccountAppService;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Threading.Tasks;
+using System;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace TodoApp.Web;
 
 [DependsOn(
@@ -105,19 +109,55 @@ public class TodoAppWebModule : AbpModule
             });
         }
     }
+    public class TextPlainInputFormatter : InputFormatter
+    {
+        public TextPlainInputFormatter()
+        {
+            SupportedMediaTypes.Add("text/plain");
+        }
 
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
+        {
+            var request = context.HttpContext.Request;
+            using (var reader = new StreamReader(request.Body))
+            {
+                var content = await reader.ReadToEndAsync();
+                return await InputFormatterResult.SuccessAsync(content);
+            }
+        }
+
+        protected override bool CanReadType(Type type)
+        {
+            return type == typeof(string);
+        }
+    }
     public override void ConfigureServices
         (ServiceConfigurationContext context)
     {
         var hostingEnvironment = context.Services.
             GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
+        context.Services.AddControllers(options =>
+        {
+            options.InputFormatters.Insert(0, new TextPlainInputFormatter());
+        });
+        context.Services.AddIdentityCore
+           <IdentityUser>(options => { });
+        context.Services.AddIdentityCore<IdentityRole>(options => { });
         context.Services.AddTransient<
             IAccountAppService, AccountAppService>();
-        context.Services.AddIdentityCore
-            <IdentityUser>(options => { });
-        context.Services.AddScoped<SignInManager<IdentityUser>,
+       
+       
+        context.Services.AddScoped<SignInManager<IdentityUser>, 
             SignInManager<IdentityUser>>();
+        context.Services.AddScoped<RoleManager<IdentityRole>, 
+            RoleManager<IdentityRole>>();
+        context.Services.AddScoped<UserManager<IdentityUser>,
+            UserManager<IdentityUser>>();
+        context.Services.AddScoped<IRoleStore<IdentityRole>, 
+            RoleStore<IdentityRole, TodoAppDbContext>>();
+        context.Services.AddScoped<IUserStore<IdentityUser>, UserStore<IdentityUser, IdentityRole, TodoAppDbContext>>();
+
         context.Services.AddDbContext<TodoAppDbContext>(options =>
         options.UseSqlServer(configuration.
         GetConnectionString("Default")));
