@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,7 @@ public class Program
                     builder.Configuration.GetConnectionString
                     ("Default"
                     )));
+            
             builder.Services.AddTransient<IAccountAppService,
                 AccountAppService>();
             builder.Services.AddAuthentication(
@@ -86,6 +88,7 @@ options.DefaultAuthenticateScheme=JwtBearerDefaults.
                 policy.RequireAuthenticatedUser());
             }
             );
+        
             builder.Services.AddEndpointsApiExplorer();
             await builder.AddApplicationAsync<TodoAppWebModule>();
             var app = builder.Build();

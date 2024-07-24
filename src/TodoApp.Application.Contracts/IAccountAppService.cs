@@ -9,5 +9,7 @@ namespace TodoApp
     public interface IAccountAppService
     {
         Task<string> LoginAsync(LoginDto input);
+       Task<bool> CreateRoleAsync(string roleName);
+        Task<bool> AssignRoleAsync(string username, string roleName);
     }
 }
