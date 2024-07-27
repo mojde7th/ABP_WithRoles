@@ -122,6 +122,7 @@ namespace TodoApp.Application
         {
             var user = await _userManager.
                 FindByNameAsync(username);
+            var t = 0;
             if (user != null)
             {
                 var result = await _userManager.AddToRoleAsync

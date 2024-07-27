@@ -31,14 +31,15 @@ namespace TodoApp
             return Ok(new { token });
         }
         [HttpPost("CreateRole")]
-        [Consumes("text/plain")]
+       // [Consumes("text/plain")]
         public async Task<IActionResult> CreateRoleAsync
-            ([FromBody] string roleName)
+            ([FromBody] RoleNameDto input)
         {
-            var result = await _accountAppService.CreateRoleAsync(roleName);
+
+            var result = await _accountAppService.CreateRoleAsync(input.RoleName);
             if (result)
             {
-                return Ok("Role assigned successfully Moj");
+                return Ok("Role created successfully Moj");
             }
             return BadRequest("Failed to assign role" +
                 "or user not found");

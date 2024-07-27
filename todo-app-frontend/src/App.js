@@ -8,7 +8,8 @@ import EditBookForm from './Components/EditBookForm';
 import EditPublisherForm from './Components/EditPublisherForm';
 import Login from './Components/Login';
 import PrivateRoute from './Components/PrivateRoute';
-
+import CreateRoleComponent from './Components/RoleManagement/CreateRole';
+import AssignRoleComponent from './Components/RoleManagement/AssignRole';
 function App() {
   return (
     <Router>
@@ -21,6 +22,8 @@ function App() {
           <Route path="/publishers" element={<PrivateRoute> < PublisherForm/></PrivateRoute>} />
           <Route path="/publishers/new" element={<PrivateRoute> <PublisherList /></PrivateRoute>} />
           <Route path="/publishers/edit/:id" element={<PrivateRoute> <PublisherList /></PrivateRoute>} />
+        <Route path="/roles/create" element={<PrivateRoute><CreateRoleComponent/> </PrivateRoute>}/>
+        <Route path="/roles/assign" element={<PrivateRoute><AssignRoleComponent/></PrivateRoute>}/>
         </Routes>
       </div>
     </Router>
