@@ -32,9 +32,16 @@ const BookList = () => {
   return (
     <div>
       <h1>Books</h1>
-      <Link to={`/publishers`}>Back to publishers Page</Link>
+      <Link to={`/publishers`}>Back to Publishers' list Page</Link>
       <br/>
-      <Link to="/books/new">Add Book</Link>
+      <Link to={`/publishers/new`}>Back to adding Publishers</Link>
+      <br/>
+      <Link to={`/roles/create`}>Back to Creating new Roles Page</Link>
+      <br/>
+      <Link to={`/roles/assign`}>Back to Assigning Roles to users Page</Link>
+      <br/>
+      <Link to="/books/new">Back to Adding new Books</Link>
+      <br/>
       <ul>
         {books.map(book => (
           <li key={book.id}>

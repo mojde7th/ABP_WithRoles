@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createBook } from '../services/bookService';
 import { getPublishers } from '../services/publisherService';
 
@@ -29,6 +29,17 @@ const BookForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <h2>Adding New Book</h2>
+      <Link to={`/publishers`}>Back to Publishers' list Page</Link>
+      
+      <Link to={`/roles/create`}>Back to Creating new Roles Page</Link>
+      
+      <Link to={`/roles/assign`}>Back to Assigning Roles to users Page</Link>
+      
+      <Link to="/publishers/new">Back to Adding new Publishers</Link>
+      
+      <Link to="/books">Back to Books Page</Link>
+      <br/>
       <div>
         <label>Name</label>
         <input type="text" name="name" value={book.name} onChange={handleChange} required />

@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { createPublisher, getPublisher, updatePublisher } from '../services/publisherService';
 import { getBooks } from '../services/bookService';
 
@@ -99,6 +99,19 @@ const PublisherForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <h2>Add a new Publisher</h2>
+      <Link to={`/publishers`}>Back to Publishers' list Page</Link>
+      <br/>
+      <Link to={`/publishers/new`}>Back to Creating new Publishers</Link>
+      <br/>
+      <Link to={`/roles/create`}>Back to Creating new Roles Page</Link>
+      <br/>
+      <Link to={`/roles/assign`}>Back to Assigning Roles to users Page</Link>
+      <br/>
+      <Link to="/books/new">Back to Addong new Books</Link>
+      <br/>
+      {/* <Link to="/books/new">Back to Addong new Books</Link> */}
+      <br/>
       <div>
         <label>Name</label>
         <input type="text" name="name" value={publisher.name} onChange={handleChange} required />

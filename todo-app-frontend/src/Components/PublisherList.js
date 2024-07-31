@@ -19,10 +19,19 @@ const PublisherList = () => {
 
   return (
     <div>
-      <h1>Publishers</h1>
-      <Link to="/publishers/new">Add Publisher</Link>
+      <h2>Publishers List</h2>
+      <Link to="/publishers/new">Back to Adding Publishers page</Link>
       <br/>
       <Link to={`/books`}>Back to Book List</Link>
+      <br/>
+      {/* <Link to={`/publishers`}>Back to Publishers' list Page</Link> */}
+     
+      <Link to={`/roles/create`}>Back to Creating new Roles Page</Link>
+      <br/>
+      <Link to={`/roles/assign`}>Back to Assigning Roles to users Page</Link>
+      <br/>
+      <Link to="/books/new">Back to Addong new Books</Link>
+      <br/>
       <ul>
         {publishers.map(publisher => (
           <li key={publisher.id}>
