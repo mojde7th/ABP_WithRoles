@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { assignRole } from "../../services/authService";
+import { useEffect, useState } from "react";
+import { assignRole,getAllUsernames } from "../../services/authService";
 import { Link } from "react-router-dom";
 
 
@@ -8,7 +8,8 @@ const AssignRoleComponent=()=>{
 const [username,setUsername]=useState('');
 const [roleName,setRoleName]=useState('');
 const [message,setMessage]=useState('');
-
+const [usernames,setUsernames]=useState([]);
+useEffect(()=>{getAllUsernames().then(response=>setUsernames(response.data));},[]);
 const handleAssignRole=async()=>{
     try{
 await assignRole(username,roleName);
@@ -38,6 +39,12 @@ return(
       <br/>
       <Link to={`/books`}>Back to Book List</Link>
       <br/>
+      <select value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Select Username">
+<option value="">Select a User</option>
+{usernames.map((user,index)=>(
+    <option key={index} value={user}>{user}</option>
+))}
+      </select>
       {/* <Link to={`/publishers`}>Back to Publishers' list Page</Link> */}
      
       {/* <Link to={`/roles/create`}>Back to Creating new Roles Page</Link> */}
@@ -53,6 +60,7 @@ placeholder="Username"
 <input type="text" value={roleName}
 onChange={(e)=>{setRoleName(e.target.value)}}
 placeholder="Role Name"/>
+
 <button onClick={handleAssignRole}>
     Assign Role
 </button>

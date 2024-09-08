@@ -18,7 +18,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
     <ProjectReference Include="..\TodoApp.Application.Tests\TodoApp.Application.Tests.csproj" />
     <ProjectReference Include="..\..\src\TodoApp.Web\TodoApp.Web.csproj" />
-    <PackageReference Include="Volo.Abp.AspNetCore.TestBase" Version="8.1.4" />
+    <PackageReference Include="Volo.Abp.AspNetCore.TestBase" Version="8.1.5" />
     <ProjectReference Include="..\TodoApp.EntityFrameworkCore.Tests\TodoApp.EntityFrameworkCore.Tests.csproj" />
   </ItemGroup>
 

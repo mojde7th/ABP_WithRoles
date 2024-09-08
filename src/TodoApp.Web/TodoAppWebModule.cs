@@ -141,19 +141,33 @@ public class TodoAppWebModule : AbpModule
         {
             options.InputFormatters.Insert(0, new TextPlainInputFormatter());
         });
+        context.Services.ConfigureApplicationCookie(options => {
+            options.Cookie.Name = "Identity.Cookie"; // Customize the cookie name to avoid conflicts
+        });
+
+        
+        context.Services.AddIdentityCore<IdentityUser>(options => { })
+      .AddRoles<IdentityRole>() // Add role support if needed
+      .AddEntityFrameworkStores<TodoAppDbContext>() // Register DbContext for Identity
+      .AddDefaultTokenProviders();
         context.Services.AddIdentityCore
            <IdentityUser>(options => { });
-        context.Services.AddIdentityCore<IdentityRole>(options => { });
+        context.Services.AddIdentityCore<IdentityRole>
+            (options => { });
+
         context.Services.AddTransient<
             IAccountAppService, AccountAppService>();
-       
-       
+        //looooooookkkkkk here
+        //context.Services.AddIdentity<IdentityUser, IdentityRole>()
+        //        .AddEntityFrameworkStores<TodoAppDbContext>()
+        //        .AddDefaultTokenProviders();
+      
         context.Services.AddScoped<SignInManager<IdentityUser>, 
             SignInManager<IdentityUser>>();
-        context.Services.AddScoped<RoleManager<IdentityRole>, 
-            RoleManager<IdentityRole>>();
-        context.Services.AddScoped<UserManager<IdentityUser>,
-            UserManager<IdentityUser>>();
+        context.Services.AddScoped<RoleManager<IdentityRole>
+            >();
+        
+        context.Services.AddScoped<UserManager<IdentityUser>>();
         context.Services.AddScoped<IRoleStore<IdentityRole>, 
             RoleStore<IdentityRole, TodoAppDbContext>>();
         context.Services.AddScoped<IUserStore<IdentityUser>, UserStore<IdentityUser, IdentityRole, TodoAppDbContext>>();

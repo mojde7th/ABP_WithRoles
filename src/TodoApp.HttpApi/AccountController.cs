@@ -60,5 +60,11 @@ namespace TodoApp
             return BadRequest("Failed to assign role or " +
                 "user not found");
         }
+        [HttpGet("GetAllUsernames")]
+        public async Task<IActionResult> GetAllUsernames()
+        {
+            var usernames=await _accountAppService.GetAllUsernamesAsync();
+            return Ok(usernames);
+        }
     }
 }

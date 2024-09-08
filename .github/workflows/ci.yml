@@ -1,0 +1,44 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Restore .NET Core dependencies
+      run: dotnet restore Backend/YourProject.sln
+
+    - name: Build .NET Core project
+      run: dotnet build --no-restore Backend/YourProject.sln
+
+    - name: Run .NET Core tests
+      run: dotnet test --no-build --verbosity normal Backend/YourProject.sln
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install npm dependencies
+      run: npm install
+      working-directory: Frontend
+
+    - name: Build React app
+      run: npm run build
+      working-directory: Frontend
+
+    - name: Deploy React app
+      run: echo "Deploy script goes here"

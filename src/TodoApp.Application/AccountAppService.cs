@@ -17,6 +17,10 @@ using Volo.Abp.Identity;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
 using IdentityRole = Volo.Abp.Identity.IdentityRole;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using TodoApp.EntityFrameworkCore;
 
 namespace TodoApp.Application
 {
@@ -28,14 +32,16 @@ namespace TodoApp.Application
         private readonly ILogger<AccountAppService> _logger;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IServiceProvider _serviceProvider;
         public AccountAppService(UserManager<IdentityUser>
             userManager, 
             SignInManager<IdentityUser> signInManager,
             IConfiguration configuration,
             ILogger<AccountAppService> logger,
             IHttpContextAccessor contextAccessor,
-           RoleManager<IdentityRole> roleManager)
+           RoleManager<IdentityRole> roleManager, IServiceProvider serviceProvider)
         {
+            _serviceProvider=serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
@@ -132,9 +138,27 @@ namespace TodoApp.Application
             return false;
         }
 
+        public async Task<List<string>> GetAllUsernamesAsync()
+        {
+            try
+            {
+                // Use a scope to resolve DbContext directly from the service provider
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<TodoAppDbContext>();
+
+                // Query the users directly from the DbContext
+                var users = await dbContext.Users.ToListAsync();
+                return users.Select(x => x.UserName).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching usernames.");
+                return new List<string>();
+            }
+        }
 
     }
-            
-            
-            }
+
+
+}
 

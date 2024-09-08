@@ -39,3 +39,6 @@ throw error;
 }
 
 };
+export const getAllUsernames=()=>{
+return axios.get(`${API_URL}/GetAllUsernames`);
+};
