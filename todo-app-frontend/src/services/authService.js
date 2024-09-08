@@ -42,3 +42,6 @@ throw error;
 export const getAllUsernames=()=>{
 return axios.get(`${API_URL}/GetAllUsernames`);
 };
+export const getAllRoles=()=>{
+    return axios.get(`${API_URL}/GetAllRoles`);
+};

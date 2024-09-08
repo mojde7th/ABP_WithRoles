@@ -66,5 +66,12 @@ namespace TodoApp
             var usernames=await _accountAppService.GetAllUsernamesAsync();
             return Ok(usernames);
         }
+
+        [HttpGet("GetAllRoles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var roles = await _accountAppService.GetAllRolesAsync();
+        
+        return Ok(roles);}
     }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { assignRole,getAllUsernames } from "../../services/authService";
+import { assignRole,getAllRoles,getAllUsernames } from "../../services/authService";
 import { Link } from "react-router-dom";
 
 
@@ -9,7 +9,15 @@ const [username,setUsername]=useState('');
 const [roleName,setRoleName]=useState('');
 const [message,setMessage]=useState('');
 const [usernames,setUsernames]=useState([]);
-useEffect(()=>{getAllUsernames().then(response=>setUsernames(response.data));},[]);
+const [roles,setRoles]=useState([]);
+useEffect(()=>{
+    getAllUsernames().then(response=>setUsernames(response.data));
+getAllRoles().then(response=>setRoles(response.data))
+.catch(error=>console.error('Error fetching roles:',error ));
+
+},[]);
+
+
 const handleAssignRole=async()=>{
     try{
 await assignRole(username,roleName);
@@ -57,10 +65,15 @@ return(
 onChange={(e)=>setUsername(e.target.value)}
 placeholder="Username"
 />
-<input type="text" value={roleName}
-onChange={(e)=>{setRoleName(e.target.value)}}
-placeholder="Role Name"/>
-
+<div>
+        <label>Role:</label>
+        <select onChange={(e) => setRoleName(e.target.value)} value={roleName}>
+          <option value="">Select a role</option>
+          {roles.map((role, index) => (
+            <option key={index} value={role}>{role}</option>
+          ))}
+        </select>
+      </div>
 <button onClick={handleAssignRole}>
     Assign Role
 </button>

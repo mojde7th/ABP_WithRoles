@@ -157,6 +157,22 @@ namespace TodoApp.Application
             }
         }
 
+
+
+        public async Task<List<String>> GetAllRolesAsync()
+        {
+            try {
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<TodoAppDbContext>();
+                var roles=await dbContext.Roles.ToListAsync();
+                return roles.Select(x=>x.Name).ToList();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An Error Occurred while fetching roles.");
+            return new List<string>();
+            }
+        }
     }
 
 

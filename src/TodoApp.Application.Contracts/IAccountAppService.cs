@@ -12,5 +12,6 @@ namespace TodoApp
        Task<bool> CreateRoleAsync(string roleName);
         Task<bool> AssignRoleAsync(string username, string roleName);
     Task<List<string>> GetAllUsernamesAsync();
+        Task<List<string>> GetAllRolesAsync();
     }
 }
