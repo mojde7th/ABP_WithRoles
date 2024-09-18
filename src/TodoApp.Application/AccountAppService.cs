@@ -21,10 +21,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using TodoApp.EntityFrameworkCore;
+using Volo.Abp.Domain.Repositories;
+using TodoApp.Domain;
+using Task = TodoApp.Domain.Task;
+using Volo.Abp.Application.Services;
 
 namespace TodoApp.Application
 {
-    public class AccountAppService:IAccountAppService
+    public class AccountAppService:ApplicationService, IAccountAppService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -33,13 +37,23 @@ namespace TodoApp.Application
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IRepository<DailyPlan, Guid> _dailyPlanRepository;
+        private readonly IRepository<Task,Guid> _taskRepository;
+        private readonly IRepository<PlanLayer,Guid> _layerRepository;
+
+        
         public AccountAppService(UserManager<IdentityUser>
             userManager, 
             SignInManager<IdentityUser> signInManager,
             IConfiguration configuration,
             ILogger<AccountAppService> logger,
             IHttpContextAccessor contextAccessor,
-           RoleManager<IdentityRole> roleManager, IServiceProvider serviceProvider)
+           RoleManager<IdentityRole> roleManager, 
+           IServiceProvider serviceProvider,
+           IRepository<DailyPlan,Guid> dailyPlanRepository,
+           IRepository<Task,Guid> taskRepository,
+           IRepository<PlanLayer, Guid> layerRepository
+           )
         {
             _serviceProvider=serviceProvider;
             _userManager = userManager;
@@ -48,6 +62,9 @@ namespace TodoApp.Application
             _logger = logger;
            _contextAccessor = contextAccessor;
           _roleManager = roleManager;
+            _taskRepository = taskRepository;
+            _layerRepository = layerRepository;
+            _dailyPlanRepository = dailyPlanRepository;
         }
 
         public async Task<string> LoginAsync(LoginDto input)
@@ -173,6 +190,73 @@ namespace TodoApp.Application
             return new List<string>();
             }
         }
+
+        public async Task<DailyPlanDto> CreateDailyPlanAsync(CreateDailyPlanDto input)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<TodoAppDbContext>();
+
+                // 1. Detach all tracked entities in the DbContext to avoid any conflicts
+                foreach (var entry in dbContext.ChangeTracker.Entries().ToList())
+                {
+                    dbContext.Entry(entry.Entity).State = EntityState.Detached;
+                }
+
+                // 2. Create the DailyPlan and ensure GUIDs are correctly generated
+                var dailyPlan = new DailyPlan
+                {
+                    Id = Guid.NewGuid(),
+                    Title = input.Title,
+                    Tasks = input.Tasks.Select(t => new Task
+                    {
+                        Id = t.Id == Guid.Empty ? Guid.NewGuid() : t.Id,
+                        Name = t.Name,
+                        Duration = t.Duration
+                    }).ToList(),
+
+                    Layers = input.Layers.Select(l => new PlanLayer
+                    {
+                        // Ensure a valid GUID is assigned. If it's zero, we generate a new one.
+                        Id = l.Id == Guid.Empty ? Guid.NewGuid() : l.Id,
+                        Name = l.Name,
+                        Duration = l.Duration
+                    }).ToList()
+                };
+
+                // 3. Add the DailyPlan to the DbContext
+                await dbContext.DailyPlans.AddAsync(dailyPlan);
+                await dbContext.SaveChangesAsync();
+
+                // 4. Prepare the DTO to return
+                var dailyPlanDto = new DailyPlanDto
+                {
+                    Id = dailyPlan.Id,
+                    Title = dailyPlan.Title,
+                    Tasks = dailyPlan.Tasks.Select(t => new TaskDto
+                    {
+                        Id = t.Id,
+                        Name = t.Name,
+                        Duration = t.Duration
+                    }).ToList(),
+                    Layers = dailyPlan.Layers.Select(l => new PlanLayerdto
+                    {
+                        Id = l.Id,
+                        Name = l.Name,
+                        Duration = l.Duration
+                    }).ToList()
+                };
+
+                return dailyPlanDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a daily plan.");
+                throw;
+            }
+        }
+
     }
 
 

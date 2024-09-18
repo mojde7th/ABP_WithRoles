@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoApp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace TodoApp.Migrations
 {
     [DbContext(typeof(TodoAppDbContext))]
-    partial class TodoAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240909063523_AddDailyPlanEntities")]
+    partial class AddDailyPlanEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,42 +57,6 @@ namespace TodoApp.Migrations
                     b.ToTable("Books", (string)null);
                 });
 
-            modelBuilder.Entity("TodoApp.Domain.DailyPlan", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NewDailyPlans", (string)null);
-                });
-
-            modelBuilder.Entity("TodoApp.Domain.Layer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DailyPlanId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DailyPlanId");
-
-                    b.ToTable("Layers", (string)null);
-                });
-
             modelBuilder.Entity("TodoApp.Domain.Publisher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -103,28 +70,6 @@ namespace TodoApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers", (string)null);
-                });
-
-            modelBuilder.Entity("TodoApp.Domain.Task", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DailyPlanId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DailyPlanId");
-
-                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -1883,28 +1828,6 @@ namespace TodoApp.Migrations
                     b.Navigation("Publisher");
                 });
 
-            modelBuilder.Entity("TodoApp.Domain.Layer", b =>
-                {
-                    b.HasOne("TodoApp.Domain.DailyPlan", "DailyPlan")
-                        .WithMany("Layers")
-                        .HasForeignKey("DailyPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DailyPlan");
-                });
-
-            modelBuilder.Entity("TodoApp.Domain.Task", b =>
-                {
-                    b.HasOne("TodoApp.Domain.DailyPlan", "DailyPlan")
-                        .WithMany("Tasks")
-                        .HasForeignKey("DailyPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DailyPlan");
-                });
-
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
                 {
                     b.HasOne("Volo.Abp.AuditLogging.AuditLog", null)
@@ -2045,13 +1968,6 @@ namespace TodoApp.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TodoApp.Domain.DailyPlan", b =>
-                {
-                    b.Navigation("Layers");
-
-                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TodoApp.Domain.Publisher", b =>

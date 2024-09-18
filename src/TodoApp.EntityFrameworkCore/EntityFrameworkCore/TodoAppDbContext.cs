@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using TodoApp.Domain;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -14,7 +15,8 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
-
+using Task = TodoApp.Domain.Task;
+using Layer = TodoApp.Domain.PlanLayer;
 namespace TodoApp.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityDbContext))]
@@ -30,18 +32,7 @@ public class TodoAppDbContext :
     public DbSet<Publisher> Publishers { get; set; }
     #region Entities from the modules
 
-    /* Notice: We only implemented IIdentityDbContext and ITenantManagementDbContext
-     * and replaced them for this DbContext. This allows you to perform JOIN
-     * queries for the entities of these modules over the repositories easily. You
-     * typically don't need that for other modules. But, if you need, you can
-     * implement the DbContext interface of the needed module and use ReplaceDbContext
-     * attribute just like IIdentityDbContext and ITenantManagementDbContext.
-     *
-     * More info: Replacing a DbContext of a module ensures that the related module
-     * uses this DbContext on runtime. Otherwise, it will use its own DbContext class.
-     */
-
-    //Identity
+   
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
     public DbSet<IdentityClaimType> ClaimTypes { get; set; }
@@ -51,6 +42,11 @@ public class TodoAppDbContext :
     public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
 
     // Tenant Management
+    public DbSet<Task> Tasks { get; set; }
+    public DbSet<Layer> Layers { get; set; }
+    public DbSet<DailyPlan> DailyPlans { get; set; }
+    
+
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
@@ -61,7 +57,13 @@ public class TodoAppDbContext :
     {
 
     }
-
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+       
+            optionsBuilder.EnableSensitiveDataLogging();
+        
+        base.OnConfiguring(optionsBuilder);
+    }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -77,7 +79,36 @@ public class TodoAppDbContext :
              .HasForeignKey(book => book.PublisherId)
              .IsRequired();
         });
-
+        builder.Entity<DailyPlan>(b => {
+            b.ToTable("NewDailyPlans");
+            b.ConfigureByConvention();
+            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            b.HasMany(dp=>dp.Tasks).WithOne(t => t.DailyPlan)
+            .HasForeignKey(t=>t.DailyPlanId)
+            .IsRequired();
+            b.HasMany(dp => dp.Layers)
+            .WithOne(l => l.DailyPlan)
+            .HasForeignKey(l=>l.DailyPlanId).
+            IsRequired();
+        });
+        builder.Entity<Task>(b =>
+        {
+            b.ToTable("Tasks");
+            b.ConfigureByConvention();
+            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            b.HasOne(t => t.DailyPlan)
+            .WithMany(dp => dp.Tasks)
+            .HasForeignKey(t => t.DailyPlanId);
+        });
+        builder.Entity<PlanLayer>(b =>
+        {
+            b.ToTable("Layers");
+            b.ConfigureByConvention();
+            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            b.HasOne(l => l.DailyPlan)
+            .WithMany(dp => dp.Layers)
+            .HasForeignKey(L => L.DailyPlanId);
+        });
         builder.Entity<Publisher>(b =>
         {
             b.ToTable("Publishers");
@@ -93,13 +124,6 @@ public class TodoAppDbContext :
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
 
-        /* Configure your own tables/entities inside here */
-
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(TodoAppConsts.DbTablePrefix + "YourEntities", TodoAppConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+      
     }
 }

@@ -51,6 +51,11 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Volo.Abp.Domain.Repositories;
+using TodoApp.Domain;
+using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
+using Task = TodoApp.Domain.Task;
+using Layer = TodoApp.Domain.PlanLayer;
 namespace TodoApp.Web;
 
 [DependsOn(
@@ -161,8 +166,16 @@ public class TodoAppWebModule : AbpModule
         //context.Services.AddIdentity<IdentityUser, IdentityRole>()
         //        .AddEntityFrameworkStores<TodoAppDbContext>()
         //        .AddDefaultTokenProviders();
-      
+        context.Services.AddScoped<IRepository<DailyPlan, Guid>,
+            EfCoreRepository<TodoAppDbContext, DailyPlan, Guid>
+            >();
+        context.Services.AddScoped<IRepository<Task, Guid>, EfCoreRepository<TodoAppDbContext, Task, Guid>>();
+        context.Services.AddScoped<IRepository<Layer, Guid>, EfCoreRepository<TodoAppDbContext, Layer, Guid>>();
+         
         context.Services.AddScoped<SignInManager<IdentityUser>, 
+         
+            
+            
             SignInManager<IdentityUser>>();
         context.Services.AddScoped<RoleManager<IdentityRole>
             >();
