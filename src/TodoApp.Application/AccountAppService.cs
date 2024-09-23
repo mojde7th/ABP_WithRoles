@@ -25,6 +25,7 @@ using Volo.Abp.Domain.Repositories;
 using TodoApp.Domain;
 using Task = TodoApp.Domain.Task;
 using Volo.Abp.Application.Services;
+using TodoApp.Helpers;
 
 namespace TodoApp.Application
 {
@@ -40,10 +41,10 @@ namespace TodoApp.Application
         private readonly IRepository<DailyPlan, Guid> _dailyPlanRepository;
         private readonly IRepository<Task,Guid> _taskRepository;
         private readonly IRepository<PlanLayer,Guid> _layerRepository;
-
-        
+        private readonly TodoAppDbContext _todoAppDbContext;
+        private readonly IServiceProvider serviceProvider1;
         public AccountAppService(UserManager<IdentityUser>
-            userManager, 
+            userManager, TodoAppDbContext tedoAppDbContext,
             SignInManager<IdentityUser> signInManager,
             IConfiguration configuration,
             ILogger<AccountAppService> logger,
@@ -55,7 +56,8 @@ namespace TodoApp.Application
            IRepository<PlanLayer, Guid> layerRepository
            )
         {
-            _serviceProvider=serviceProvider;
+            _todoAppDbContext= tedoAppDbContext;
+            _serviceProvider =serviceProvider;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
@@ -66,7 +68,11 @@ namespace TodoApp.Application
             _layerRepository = layerRepository;
             _dailyPlanRepository = dailyPlanRepository;
         }
-
+        private string GetFormattedDuration(int duration)
+        {
+            return TimeConversionHelper.ConvertMinutesToHoursAndMinutes
+                (duration);
+        }
         public async Task<string> LoginAsync(LoginDto input)
         {
             var context = _contextAccessor.HttpContext;
@@ -191,6 +197,40 @@ namespace TodoApp.Application
             }
         }
 
+
+        public async Task<List<DailyPlanDto>> GetDailyPlansAsync()
+        {
+            var dailyPlans=await _todoAppDbContext
+                .DailyPlans.
+                Include(dp=>dp.Tasks)
+                .Include(dp=>dp.Layers)
+                .ToListAsync();
+
+            return dailyPlans.Select(dp => new DailyPlanDto
+            {
+                Id = dp.Id,
+                Title = dp.Title,
+                Tasks = dp.Tasks.Select
+                (t => new TaskDto
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Duration = t.Duration
+                                }).ToList(),
+                Layers = dp.Layers.Select
+                (l => new PlanLayerdto
+                {
+                    Id = l.Id,
+                    Name = l.Name,
+                    Duration =
+                   l.Duration  }).ToList(),
+                TotalTaskDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Tasks.Sum(t => t.Duration)),
+                TotalLayerDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Layers.Sum(l => l.Duration)),
+                TotalDayDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Tasks.Sum(t => t.Duration) + dp.Layers.Sum(l => l.Duration))
+            }).ToList();
+
+        }
+
         public async Task<DailyPlanDto> CreateDailyPlanAsync(CreateDailyPlanDto input)
         {
             try
@@ -256,6 +296,64 @@ namespace TodoApp.Application
                 throw;
             }
         }
+        public async Task<DailyPlanDto> GetDailyPlanByIdAsync(Guid id)
+        {
+            var dailyPlan = await _todoAppDbContext.DailyPlans
+                .Include(dp => dp.Tasks)
+                .Include(dp => dp.Layers)
+                .FirstOrDefaultAsync(dp => dp.Id == id);
+            if (dailyPlan == null) {
+                throw new Exception("Daily Plan" +
+                    "Not Found");
+            }
+            return new DailyPlanDto
+            {
+                Id= dailyPlan.Id,
+                Title = dailyPlan.Title,
+                Tasks=dailyPlan.Tasks.
+                Select(t=>new TaskDto
+                {
+                    Id=t.Id,
+                    Name = t.Name,
+                    Duration = t.Duration
+                }
+                ).ToList(),
+                Layers=dailyPlan.Layers.Select
+                (l=>new PlanLayerdto
+                {
+                    Id=l.Id,
+                    Name=l.Name,
+                    Duration=l.Duration
+                }
+                ).ToList()
+
+            };
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 

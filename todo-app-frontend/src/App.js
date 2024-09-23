@@ -10,6 +10,8 @@ import Login from './Components/Login';
 import PrivateRoute from './Components/PrivateRoute';
 import CreateRoleComponent from './Components/RoleManagement/CreateRole';
 import AssignRoleComponent from './Components/RoleManagement/AssignRole';
+import CreateDailyPlan from './Components/CreateDailyPlan';
+import DailyPlanList from './Components/DailyPlanList'
 function App() {
   return (
     <Router>
@@ -24,6 +26,8 @@ function App() {
           <Route path="/publishers/edit/:id" element={<PrivateRoute> <PublisherList /></PrivateRoute>} />
         <Route path="/roles/create" element={<PrivateRoute><CreateRoleComponent/> </PrivateRoute>}/>
         <Route path="/roles/assign" element={<PrivateRoute><AssignRoleComponent/></PrivateRoute>}/>
+       <Route path="/dailyplans" element={<DailyPlanList/>}/>
+       <Route path="/dailyplans/new"  element={<CreateDailyPlan/>}/>
         </Routes>
       </div>
     </Router>

@@ -9,7 +9,7 @@ namespace TodoApp.Controllers
 {
     [Route("api/dailyplan")]
     [ApiController]
-    public class DailyPlanController:ControllerBase
+    public class DailyPlanController : ControllerBase
     {
         private readonly IAccountAppService _accountAppService;
         public DailyPlanController(IAccountAppService accountAppService)
@@ -24,6 +24,18 @@ namespace TodoApp.Controllers
                 .CreateDailyPlanAsync(input);
             return Ok(result);
         }
-        
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyPlansAsync()
+        {
+            var result = await _accountAppService.GetDailyPlansAsync();
+            return Ok(result);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDailyPlanByIdAsync(Guid id)
+        {
+            var result = await _accountAppService.GetDailyPlanByIdAsync(id);
+            return Ok(result);
+        }
     }
 }

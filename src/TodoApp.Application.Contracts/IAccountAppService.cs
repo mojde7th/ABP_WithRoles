@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using TodoApp.Application.Contracts;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
-
+using TodoApp.Application;
+using TodoApp.Helpers;
 namespace TodoApp
 {
     public interface IAccountAppService:IApplicationService
@@ -14,11 +15,12 @@ namespace TodoApp
        Task<bool> CreateRoleAsync(string roleName);
         Task<bool> AssignRoleAsync(string username, string roleName);
     Task<List<string>> GetAllUsernamesAsync();
-        
+        Task<List<DailyPlanDto>> GetDailyPlansAsync();
         Task<List<string>> GetAllRolesAsync();
         Task<DailyPlanDto>
             CreateDailyPlanAsync
             (CreateDailyPlanDto input);
+        Task<DailyPlanDto> GetDailyPlanByIdAsync(Guid id);
     }
 
     public class CreateDailyPlanDto
@@ -44,15 +46,25 @@ namespace TodoApp
         public string Title { get; set; }
         public List<TaskDto> Tasks { get; set; }
         public List<PlanLayerdto> Layers { get; set; }
+        public string TotalTaskDuration { get; set; }
+        public string TotalLayerDuration { get; set; }
+        public string TotalDayDuration { get; set; }
     }
-    public class TaskDto { 
+    public class TaskDto {
         public Guid Id { get; set; }
-    public string Name { get; set; }
+        public string Name { get; set; }
         public int Duration { get; set; }
+        public string FormattedDuration
+            => TimeConversionHelper.ConvertMinutesToHoursAndMinutes
+            (Duration);
     }
     public class PlanLayerdto { 
         public Guid Id { get; set; }
     public string Name { get; set; }
         public int Duration { get; set; }
+        public string FormattedDuration=>
+            TimeConversionHelper.ConvertMinutesToHoursAndMinutes
+            (Duration);
     }
+    
 }
