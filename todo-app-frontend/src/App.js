@@ -12,6 +12,7 @@ import CreateRoleComponent from './Components/RoleManagement/CreateRole';
 import AssignRoleComponent from './Components/RoleManagement/AssignRole';
 import CreateDailyPlan from './Components/CreateDailyPlan';
 import DailyPlanList from './Components/DailyPlanList'
+import DailyPlanDetail from './Components/DailyPlanDetail';
 function App() {
   return (
     <Router>
@@ -28,6 +29,7 @@ function App() {
         <Route path="/roles/assign" element={<PrivateRoute><AssignRoleComponent/></PrivateRoute>}/>
        <Route path="/dailyplans" element={<DailyPlanList/>}/>
        <Route path="/dailyplans/new"  element={<CreateDailyPlan/>}/>
+       <Route path="/dailyplan/:id"  element={<DailyPlanDetail/>}/>
         </Routes>
       </div>
     </Router>
