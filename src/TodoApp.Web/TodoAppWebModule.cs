@@ -78,7 +78,7 @@ public class TodoAppWebModule : AbpModule
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
-        //context.Services.AddAutoMapper(typeof(BookMappingProfile));
+        context.Services.AddAutoMapper(typeof(Program));
         context.Services.PreConfigure<AbpMvcDataAnnotationsLocalizationOptions>(options =>
         {
             options.AddAssemblyResource(

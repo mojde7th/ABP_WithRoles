@@ -4,17 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace TodoApp.Domain
 {
-    public class DailyPlan: Entity<Guid>
+    public class DailyPlan: FullAuditedEntity<Guid>
     {
-        public Guid Id {  get; set; }
-        public string Title { get; set; }
-        public ICollection<Task> Tasks { get; set; }
-        = new List<Task>();
-        public ICollection<PlanLayer> Layers { get; set; }
-        =new List<PlanLayer>();
+         public string Title { get; set; }
+        public virtual ICollection<Section> Sections { get; set; }
 
     }
 }

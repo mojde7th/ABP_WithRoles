@@ -45,7 +45,7 @@ public class TodoAppDbContext :
     public DbSet<Task> Tasks { get; set; }
     public DbSet<Layer> Layers { get; set; }
     public DbSet<DailyPlan> DailyPlans { get; set; }
-    
+    public DbSet<Section> Sections { get; set; }
 
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
@@ -79,42 +79,31 @@ public class TodoAppDbContext :
              .HasForeignKey(book => book.PublisherId)
              .IsRequired();
         });
-        builder.Entity<DailyPlan>(b => {
-            b.ToTable("NewDailyPlans");
-            b.ConfigureByConvention();
-            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            b.HasMany(dp=>dp.Tasks).WithOne(t => t.DailyPlan)
-            .HasForeignKey(t=>t.DailyPlanId)
-            .IsRequired();
-            b.HasMany(dp => dp.Layers)
-            .WithOne(l => l.DailyPlan)
-            .HasForeignKey(l=>l.DailyPlanId).
-            IsRequired();
-        });
-        builder.Entity<Task>(b =>
-        {
-            b.ToTable("Tasks");
-            b.ConfigureByConvention();
-            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            b.HasOne(t => t.DailyPlan)
-            .WithMany(dp => dp.Tasks)
-            .HasForeignKey(t => t.DailyPlanId);
-        });
-        builder.Entity<PlanLayer>(b =>
-        {
-            b.ToTable("Layers");
-            b.ConfigureByConvention();
-            b.Property(x => x.Id).HasDefaultValueSql("NEWID()");
-            b.HasOne(l => l.DailyPlan)
-            .WithMany(dp => dp.Layers)
-            .HasForeignKey(L => L.DailyPlanId);
-        });
         builder.Entity<Publisher>(b =>
         {
             b.ToTable("Publishers");
             b.ConfigureByConvention(); // auto configure for the base class props
             b.Property(x => x.Name).IsRequired().HasMaxLength(128);
         });
+        ////////////////
+        builder.Entity<Section>()
+            .HasOne(s => s.DailyPlan)
+            .WithMany(p => p.Sections)
+            .HasForeignKey(s => s.DailyPlanId);
+        ////////////////////
+
+        builder.Entity<Task>()
+            .HasOne(t => t.Section)
+            .WithMany(t => t.Tasks)
+            .HasForeignKey(t => t.SectionId);
+        /////////////////////
+        builder.Entity<PlanLayer>()
+            .HasOne(l=>l.Section)
+            .WithMany(s=>s.PlanLayers)
+            .HasForeignKey(l=>l.SectionId);
+
+
+        /////////////////////
         builder.ConfigurePermissionManagement();
         builder.ConfigureSettingManagement();
         builder.ConfigureBackgroundJobs();

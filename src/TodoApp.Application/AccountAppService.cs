@@ -26,11 +26,15 @@ using TodoApp.Domain;
 using Task = TodoApp.Domain.Task;
 using Volo.Abp.Application.Services;
 using TodoApp.Helpers;
+using System.Runtime.Intrinsics.Arm;
+using Volo.Abp.Domain.Entities;
+using AutoMapper;
 
 namespace TodoApp.Application
 {
     public class AccountAppService:ApplicationService, IAccountAppService
     {
+
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
@@ -41,8 +45,12 @@ namespace TodoApp.Application
         private readonly IRepository<DailyPlan, Guid> _dailyPlanRepository;
         private readonly IRepository<Task,Guid> _taskRepository;
         private readonly IRepository<PlanLayer,Guid> _layerRepository;
+        private readonly IRepository<Section,Guid> _sectionRepository;
         private readonly TodoAppDbContext _todoAppDbContext;
         private readonly IServiceProvider serviceProvider1;
+        private readonly IMapper _mapper;
+
+
         public AccountAppService(UserManager<IdentityUser>
             userManager, TodoAppDbContext tedoAppDbContext,
             SignInManager<IdentityUser> signInManager,
@@ -53,9 +61,12 @@ namespace TodoApp.Application
            IServiceProvider serviceProvider,
            IRepository<DailyPlan,Guid> dailyPlanRepository,
            IRepository<Task,Guid> taskRepository,
-           IRepository<PlanLayer, Guid> layerRepository
+           IRepository<PlanLayer, Guid> layerRepository,
+           IRepository<Section,Guid> sectionRepository,
+           IMapper mapper
            )
         {
+            _sectionRepository = sectionRepository;
             _todoAppDbContext= tedoAppDbContext;
             _serviceProvider =serviceProvider;
             _userManager = userManager;
@@ -67,12 +78,9 @@ namespace TodoApp.Application
             _taskRepository = taskRepository;
             _layerRepository = layerRepository;
             _dailyPlanRepository = dailyPlanRepository;
+            _mapper = mapper;
         }
-        private string GetFormattedDuration(int duration)
-        {
-            return TimeConversionHelper.ConvertMinutesToHoursAndMinutes
-                (duration);
-        }
+      
         public async Task<string> LoginAsync(LoginDto input)
         {
             var context = _contextAccessor.HttpContext;
@@ -108,7 +116,6 @@ namespace TodoApp.Application
             _logger.LogWarning("Invalid Login",input.Username);
             throw new UnauthorizedAccessException("Invalid Login");
         }
-
         private string GenerateMyJWt(IdentityUser user) {
             var claims = new[]
             {
@@ -130,8 +137,7 @@ namespace TodoApp.Application
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public async Task<bool> CreateRoleAsync
-            (string roleName)
+        public async Task<bool> CreateRoleAsync (string roleName)
         {
             var roleExists = await _roleManager.
                 RoleExistsAsync(roleName);
@@ -145,9 +151,7 @@ namespace TodoApp.Application
             }
             return false;
         }
-
-        public async Task<bool> AssignRoleAsync
-            (string username, string roleName)
+        public async Task<bool> AssignRoleAsync (string username, string roleName)
         {
             var user = await _userManager.
                 FindByNameAsync(username);
@@ -160,7 +164,6 @@ namespace TodoApp.Application
             }
             return false;
         }
-
         public async Task<List<string>> GetAllUsernamesAsync()
         {
             try
@@ -179,9 +182,6 @@ namespace TodoApp.Application
                 return new List<string>();
             }
         }
-
-
-
         public async Task<List<String>> GetAllRolesAsync()
         {
             try {
@@ -198,158 +198,79 @@ namespace TodoApp.Application
         }
 
 
-        public async Task<List<DailyPlanDto>> GetDailyPlansAsync()
+      public async Task<DailyPlanDto> CreateDailyPlanAsync
+            (CreateDailyPlanDto input)
         {
-            var dailyPlans=await _todoAppDbContext
-                .DailyPlans.
-                Include(dp=>dp.Tasks)
-                .Include(dp=>dp.Layers)
-                .ToListAsync();
+           var dailyPlan=_mapper.Map<DailyPlan>(input);
 
-            return dailyPlans.Select(dp => new DailyPlanDto
-            {
-                Id = dp.Id,
-                Title = dp.Title,
-                Tasks = dp.Tasks.Select
-                (t => new TaskDto
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Duration = t.Duration
-                                }).ToList(),
-                Layers = dp.Layers.Select
-                (l => new PlanLayerdto
-                {
-                    Id = l.Id,
-                    Name = l.Name,
-                    Duration =
-                   l.Duration  }).ToList(),
-                TotalTaskDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Tasks.Sum(t => t.Duration)),
-                TotalLayerDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Layers.Sum(l => l.Duration)),
-                TotalDayDuration = TimeConversionHelper.ConvertMinutesToHoursAndMinutes(dp.Tasks.Sum(t => t.Duration) + dp.Layers.Sum(l => l.Duration))
-            }).ToList();
-
+            await _dailyPlanRepository.InsertAsync(dailyPlan);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return _mapper.Map<DailyPlanDto>(dailyPlan);
         }
 
-        public async Task<DailyPlanDto> CreateDailyPlanAsync(CreateDailyPlanDto input)
+
+        public async Task<DailyPlanDto> GetDailyPlanByIdAsync
+            (Guid id)
         {
-            try
-            {
-                using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<TodoAppDbContext>();
-
-                // 1. Detach all tracked entities in the DbContext to avoid any conflicts
-                foreach (var entry in dbContext.ChangeTracker.Entries().ToList())
-                {
-                    dbContext.Entry(entry.Entity).State = EntityState.Detached;
-                }
-
-                // 2. Create the DailyPlan and ensure GUIDs are correctly generated
-                var dailyPlan = new DailyPlan
-                {
-                    Id = Guid.NewGuid(),
-                    Title = input.Title,
-                    Tasks = input.Tasks.Select(t => new Task
-                    {
-                        Id = t.Id == Guid.Empty ? Guid.NewGuid() : t.Id,
-                        Name = t.Name,
-                        Duration = t.Duration
-                    }).ToList(),
-
-                    Layers = input.Layers.Select(l => new PlanLayer
-                    {
-                        // Ensure a valid GUID is assigned. If it's zero, we generate a new one.
-                        Id = l.Id == Guid.Empty ? Guid.NewGuid() : l.Id,
-                        Name = l.Name,
-                        Duration = l.Duration
-                    }).ToList()
-                };
-
-                // 3. Add the DailyPlan to the DbContext
-                await dbContext.DailyPlans.AddAsync(dailyPlan);
-                await dbContext.SaveChangesAsync();
-
-                // 4. Prepare the DTO to return
-                var dailyPlanDto = new DailyPlanDto
-                {
-                    Id = dailyPlan.Id,
-                    Title = dailyPlan.Title,
-                    Tasks = dailyPlan.Tasks.Select(t => new TaskDto
-                    {
-                        Id = t.Id,
-                        Name = t.Name,
-                        Duration = t.Duration
-                    }).ToList(),
-                    Layers = dailyPlan.Layers.Select(l => new PlanLayerdto
-                    {
-                        Id = l.Id,
-                        Name = l.Name,
-                        Duration = l.Duration
-                    }).ToList()
-                };
-
-                return dailyPlanDto;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating a daily plan.");
-                throw;
-            }
+            var dailyPlan = await _dailyPlanRepository.GetAsync(dp=> dp.Id==id);
+            return _mapper.Map<DailyPlanDto>(dailyPlan);
         }
-        public async Task<DailyPlanDto> GetDailyPlanByIdAsync(Guid id)
-        {
-            var dailyPlan = await _todoAppDbContext.DailyPlans
-                .Include(dp => dp.Tasks)
-                .Include(dp => dp.Layers)
-                .FirstOrDefaultAsync(dp => dp.Id == id);
-            if (dailyPlan == null) {
-                throw new Exception("Daily Plan" +
-                    "Not Found");
-            }
-            return new DailyPlanDto
-            {
-                Id= dailyPlan.Id,
-                Title = dailyPlan.Title,
-                Tasks=dailyPlan.Tasks.
-                Select(t=>new TaskDto
-                {
-                    Id=t.Id,
-                    Name = t.Name,
-                    Duration = t.Duration
-                }
-                ).ToList(),
-                Layers=dailyPlan.Layers.Select
-                (l=>new PlanLayerdto
-                {
-                    Id=l.Id,
-                    Name=l.Name,
-                    Duration=l.Duration
-                }
-                ).ToList()
 
+
+
+        //Get All Daily Plans
+        public async Task<List<DailyPlanDto>> GetAllDailyPlansAsync()
+        {
+            var dailyPlans = await _dailyPlanRepository.GetListAsync();
+            return _mapper.Map<List<DailyPlanDto>>(dailyPlans);
+        }
+
+
+        //Add Section to Daily Plan
+        public async Task<SectionDto> AddSectionToDailyPlanAsync
+            (Guid dailyPlanId,CreateSectionDto input)
+        {
+            var section = new Section
+            {
+                Name = input.Name,
+                DailyPlanId = dailyPlanId
             };
-
+            await _sectionRepository.InsertAsync(section);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return ObjectMapper.Map<Section,SectionDto>(section);
 
         }
 
 
+        //Add Task To Section
+        public async Task<TaskDto> AddTaskToSectionAsync
+            (Guid sectionId,CreateTaskDto input)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        {
+            var task = new Task
+            {
+                SectionId = sectionId,
+                Name = input.Name,
+                Duration = input.Duration
+            };
+            await _taskRepository.InsertAsync(task);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return ObjectMapper.Map<Task,TaskDto>(task);
+        }
+        //Add Layer to Section
+        public async Task<PlanLayerdto> AddLayerToSectionAsync
+            (Guid sectionId, CreateLayerDto input)
+        {
+            var layer = new PlanLayer
+            {
+                SectionId = sectionId,
+                Name = input.Name,
+                Duration = input.Duration
+            };
+            await _layerRepository.InsertAsync(layer);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return ObjectMapper.Map<PlanLayer,PlanLayerdto>(layer);
+        }
 
 
 

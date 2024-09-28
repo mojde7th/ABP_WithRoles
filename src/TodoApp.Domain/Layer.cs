@@ -6,16 +6,16 @@ using System.Threading.Tasks;
  
 using TodoApp.Domain;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace TodoApp.Domain
 {
 
-    public class PlanLayer:Entity<Guid>
+    public class PlanLayer:FullAuditedEntity<Guid>
     {
-        public Guid Id {  get; set; }
         public string Name { get; set; }
         public int Duration { get; set; }
-        public Guid DailyPlanId { get; set; }
-        public DailyPlan DailyPlan { get; set; }
+        public Guid SectionId { get; set; }
+        public Section Section { get; set; }
     }
 }
