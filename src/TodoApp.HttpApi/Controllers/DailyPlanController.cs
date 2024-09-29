@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TodoApp.Domain;
+using Volo.Abp.Domain.Repositories;
 
 namespace TodoApp.Controllers
 {
@@ -12,10 +16,19 @@ namespace TodoApp.Controllers
     [ApiController]
     public class DailyPlanController : ControllerBase
     {
+        
         private readonly IAccountAppService _accountAppService;
-        public DailyPlanController(IAccountAppService accountAppService)
+        private readonly IRepository<Section, Guid> _sectionRepository;
+        private readonly IMapper _mapper;
+        
+        public DailyPlanController(IAccountAppService accountAppService,
+            IRepository<Section, Guid> sectionRepository, IMapper
+            mapper
+            )
         {
             _accountAppService = accountAppService;
+            _sectionRepository = sectionRepository;
+            _mapper = mapper;
         }
         [HttpPost("create")]
         public async Task<IActionResult> CreateDailyplanAsync
@@ -63,5 +76,16 @@ namespace TodoApp.Controllers
             var result=await _accountAppService.AddLayerToSectionAsync(sectionId, input);   
             return Ok(result);
         }
+        [HttpGet("{id}/sections/{sectionId}")]
+        public async Task<IActionResult>
+            GetSectionByIdAsync(Guid id, Guid sectionId)
+        {
+            var section = await _sectionRepository
+                .WithDetails(s => s.Tasks, s => s.PlanLayers)
+                .FirstOrDefaultAsync(s => s.Id == sectionId &&
+                s.DailyPlanId == id);
+            return Ok(_mapper.Map<SectionDto>(section));
+        }
+
     }
 }

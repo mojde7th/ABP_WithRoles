@@ -212,8 +212,23 @@ namespace TodoApp.Application
         public async Task<DailyPlanDto> GetDailyPlanByIdAsync
             (Guid id)
         {
-            var dailyPlan = await _dailyPlanRepository.GetAsync(dp=> dp.Id==id);
-            return _mapper.Map<DailyPlanDto>(dailyPlan);
+            var dailyPlan=await _dailyPlanRepository
+                .WithDetails(dp=>dp.Sections)
+                .Include(dp=>dp.Sections)
+                .ThenInclude(s=>s.Tasks)
+                .Include(dp=>dp.Sections)
+                .ThenInclude(s=>s.PlanLayers)
+                .FirstOrDefaultAsync(dp=>dp.Id==id);
+             var dailyPlanDto= _mapper.Map<DailyPlanDto>(dailyPlan);
+       
+                foreach(var section in dailyPlanDto.Sections)
+            {
+                section.TotalTaskDuration = section.Tasks.Sum
+                    (t => t.Duration);
+                section.TotalLayerDuration = section.PlanLayers.Sum
+                    (l => l.Duration);
+            }
+                return dailyPlanDto;
         }
 
 
@@ -221,8 +236,25 @@ namespace TodoApp.Application
         //Get All Daily Plans
         public async Task<List<DailyPlanDto>> GetAllDailyPlansAsync()
         {
-            var dailyPlans = await _dailyPlanRepository.GetListAsync();
-            return _mapper.Map<List<DailyPlanDto>>(dailyPlans);
+            var dailyPlans=await _dailyPlanRepository
+                .WithDetails(dp=>dp.Sections)
+                .Include(dp=>dp.Sections)
+                .ThenInclude(s=>s.Tasks)
+                .Include (dp=>dp.Sections)
+                .ThenInclude (s=>s.PlanLayers)
+                .ToListAsync();
+            var dailyPlanDtos= _mapper.Map<List<DailyPlanDto>>(dailyPlans);
+       foreach(var dailyPlan in dailyPlanDtos)
+            {
+                foreach(var section in dailyPlan.Sections)
+                {
+                    section.TotalTaskDuration=section.Tasks.Sum
+                        (t=>t.Duration);
+                    section.TotalLayerDuration=section.PlanLayers
+                        .Sum(l=>l.Duration);
+                }
+            }
+            return dailyPlanDtos;
         }
 
 
