@@ -1,38 +1,30 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAllDailyPlans } from "../services/dailyPlanService";
+import { useEffect, useState } from 'react';
+import { getAllDailyPlans } from '../services/dailyPlanService';
+import { Link } from 'react-router-dom';
 
-const DailyPlanList=()=>{
-const[dailyPlans,setDailyPlans]=useState([]);
-const navigate=useNavigate();
-useEffect(()=>{
-const fetchDailyPlans=async()=>{
-const response=await getAllDailyPlans();
-setDailyPlans(response.data ||[]);
-};
-fetchDailyPlans();
-},[]);
+const DailyPlanList = () => {
+    const [dailyPlans, setDailyPlans] = useState([]);
 
-return(
-    <div>
-        <h1>Daily Plans</h1>
-        <ul>
-            {dailyPlans.map(
-                plan=>(
-                    <li key={plan.id}
-                    onClick={()=>navigate(`/dailyPlan/${plan.id}`)}
-                    >
-                    {plan.title}
+    useEffect(() => {
+        const fetchDailyPlans = async () => {
+            const response = await getAllDailyPlans();
+            setDailyPlans(response.data);
+        };
+        fetchDailyPlans();
+    }, []);
+
+    return (
+        <div>
+            <h2>Daily Plans</h2>
+            <ul>
+                {dailyPlans.map((plan) => (
+                    <li key={plan.id}>
+                        <Link to={`/dailyplans/${plan.id}`}>{plan.title}</Link>
                     </li>
-                )
-
-            )}
-        </ul>
-    </div>
-)
-
-
-
-
+                ))}
+            </ul>
+            <Link to="/dailyplans/new">Create New Daily Plan</Link>
+        </div>
+    );
 };
 export default DailyPlanList;

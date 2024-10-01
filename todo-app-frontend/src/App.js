@@ -29,7 +29,7 @@ function App() {
         <Route path="/roles/assign" element={<PrivateRoute><AssignRoleComponent/></PrivateRoute>}/>
        <Route path="/dailyplans" element={<DailyPlanList/>}/>
        <Route path="/dailyplans/new"  element={<CreateDailyPlan/>}/>
-       <Route path="/dailyplan/:id"  element={<DailyPlanDetail/>}/>
+       <Route path="/dailyplans/:id"  element={<DailyPlanDetail/>}/>
         </Routes>
       </div>
     </Router>

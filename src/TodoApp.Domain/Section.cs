@@ -18,7 +18,9 @@ namespace TodoApp.Domain
 
         public int TotalTaskDuration { get; set; }
         public int TotalLayerDuration { get; set; }
-        public int TotalDuration => TotalTaskDuration +
-            TotalLayerDuration;
+        public int TotalDuration { get; set; }
+        public int CumulativeTaskDuration { get; set; }
+        public int CumulativeLayerDuration { get;set; }
+        public int CumulativeTotalDuration  { get; set; }
      }
 }

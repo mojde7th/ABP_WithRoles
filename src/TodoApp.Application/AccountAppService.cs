@@ -220,13 +220,20 @@ namespace TodoApp.Application
                 .ThenInclude(s=>s.PlanLayers)
                 .FirstOrDefaultAsync(dp=>dp.Id==id);
              var dailyPlanDto= _mapper.Map<DailyPlanDto>(dailyPlan);
-       
+            int cumulativeTaskDuration = 0;
+            int cumulativeLayerDuration = 0;
                 foreach(var section in dailyPlanDto.Sections)
             {
                 section.TotalTaskDuration = section.Tasks.Sum
                     (t => t.Duration);
                 section.TotalLayerDuration = section.PlanLayers.Sum
                     (l => l.Duration);
+                section.TotalDuration = section.TotalTaskDuration + section.TotalLayerDuration;
+                 cumulativeTaskDuration += section.TotalTaskDuration;
+                cumulativeLayerDuration += section.TotalLayerDuration;
+                section.CumulativeTaskDuration = cumulativeTaskDuration;
+                section.CumulativeLayerDuration = cumulativeLayerDuration;
+                section.CumulativeTotalDuration = cumulativeTaskDuration + cumulativeLayerDuration;
             }
                 return dailyPlanDto;
         }
