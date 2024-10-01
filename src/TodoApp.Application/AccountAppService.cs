@@ -208,11 +208,53 @@ namespace TodoApp.Application
             return _mapper.Map<DailyPlanDto>(dailyPlan);
         }
 
+        public async Task<DailyPlanDto> CreateDailyPlanWithSectionAsync
+            (createDailyPlanWithSectionsDto input)
+        {
+            //Create the daily plan
+            var dailyPlan = new DailyPlan
+            {
+                Title = input.Title
+            };
+            //Add Sections with tasks and layers
+
+            foreach(var sectionDto2 in input.sections)
+            {
+                var section = new Section
+                {
+                    Name=sectionDto2.Name,
+                    DailyPlan = dailyPlan
+                };
+                foreach(var taskDto in sectionDto2.Tasks)
+                {
+                    var task = new Task
+                    {
+                        Name = taskDto.Name,
+                        Duration = taskDto.Duration,
+                        Section = section
+                    };
+                    section.Tasks.Add(task);
+                }
+                foreach (var layerDto in sectionDto2.PlanLayes)
+                {
+                    var layer = new PlanLayer
+                    {
+                        Name = layerDto.Name,
+                        Duration = layerDto.Duration,
+                        Section = section
+                    };
+                    section.PlanLayers.Add(layer);
+                }
+                dailyPlan.Sections.Add(section);
+            }
+            await _dailyPlanRepository.InsertAsync(dailyPlan);
+            return _mapper.Map<DailyPlan, DailyPlanDto>(dailyPlan);
+        }
 
         public async Task<DailyPlanDto> GetDailyPlanByIdAsync
             (Guid id)
         {
-            var dailyPlan=await _dailyPlanRepository
+            var dailyPlan=await _dailyPlanRepository 
                 .WithDetails(dp=>dp.Sections)
                 .Include(dp=>dp.Sections)
                 .ThenInclude(s=>s.Tasks)

@@ -87,5 +87,19 @@ namespace TodoApp.Controllers
             return Ok(_mapper.Map<SectionDto>(section));
         }
 
+        [HttpPost("create-with-sections")]
+        public async Task<IActionResult> CreateDailyPlanWithSectionsAsync
+            ([FromBody]  createDailyPlanWithSectionsDto input)
+        {
+            var result= await _accountAppService.CreateDailyPlanWithSectionAsync
+                (input);
+            return Ok(result);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllDailyPlans2()
+        {
+            var dailyPlans=await _accountAppService.GetAllDailyPlansAsync();
+            return Ok(dailyPlans);
+        }
     }
 }

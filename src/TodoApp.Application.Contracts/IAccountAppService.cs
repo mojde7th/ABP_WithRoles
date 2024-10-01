@@ -17,7 +17,7 @@ namespace TodoApp
         Task<List<string>> GetAllUsernamesAsync();
         Task<List<string>> GetAllRolesAsync();
 
-        
+        Task<DailyPlanDto> CreateDailyPlanWithSectionAsync(createDailyPlanWithSectionsDto input);
         Task<DailyPlanDto> CreateDailyPlanAsync (CreateDailyPlanDto input);
         Task<List<DailyPlanDto>> GetAllDailyPlansAsync();
         Task<DailyPlanDto> GetDailyPlanByIdAsync(Guid id);
@@ -45,6 +45,21 @@ namespace TodoApp
         public string Name { get; set; }
         public int Duration { get; set; }
             }
+         public class CreateSectionDto2
+    {
+        public string Name { get; set; }
+        public List<CreateTaskDto> Tasks { get; set; }
+        public List<CreateLayerDto> PlanLayes { get; set; }
+
+    }
+        public class createDailyPlanWithSectionsDto
+    {
+        public string Title { get; set; }
+        public List<CreateSectionDto2> sections { get; set; }
+
+    }
+
+
 
         public class DailyPlanDto:EntityDto<Guid> 
     {
