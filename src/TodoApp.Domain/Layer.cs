@@ -13,6 +13,9 @@ namespace TodoApp.Domain
 
     public class PlanLayer:FullAuditedEntity<Guid>
     {
+        public PlanLayer() {
+            Id = Guid.NewGuid();
+        }
         public string Name { get; set; }
         public int Duration { get; set; }
         public Guid SectionId { get; set; }

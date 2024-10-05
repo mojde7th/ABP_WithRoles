@@ -24,7 +24,7 @@ namespace TodoApp
         Task<SectionDto> AddSectionToDailyPlanAsync(Guid dailyPlanId, CreateSectionDto input);
         Task<TaskDto> AddTaskToSectionAsync(Guid sectionId,CreateTaskDto input);
         Task<PlanLayerdto> AddLayerToSectionAsync(Guid sectionId,CreateLayerDto input);
-
+        Task<DailyPlanDto> CreateFullDailyPlanAsync(CreateFullDailyplanDto input);
 
 
     }
@@ -36,12 +36,16 @@ namespace TodoApp
         public class CreateSectionDto
     {
         public string Name { get; set; }
+        public List<CreateTaskDto> Tasks { get; set; }
+        public List<CreateLayerDto> PlanLayers { get; set; }
     }
-        public class CreateTaskDto { 
-    public string Name { get; set; }
+        public class CreateTaskDto {
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Name { get; set; }
         public int Duration { get; set; }
     }
         public class CreateLayerDto {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; }
         public int Duration { get; set; }
             }
@@ -59,7 +63,11 @@ namespace TodoApp
 
     }
 
-
+        public class CreateFullDailyplanDto
+        {
+            public string Title { get; set; }
+            public List<CreateSectionDto> Sections { get; set; }
+        }
 
         public class DailyPlanDto:EntityDto<Guid> 
     {

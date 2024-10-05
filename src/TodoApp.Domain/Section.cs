@@ -10,6 +10,10 @@ namespace TodoApp.Domain
     public class Section:
         FullAuditedEntity<Guid>
     {
+        public Section()
+        {
+            Id = Guid.NewGuid();
+        }
         public string Name { get; set; }
         public Guid DailyPlanId { get; set; }
         public DailyPlan DailyPlan { get; set; }

@@ -11,8 +11,10 @@ namespace TodoApp.Domain
 {
     public class Task:FullAuditedEntity<Guid>
     {
-    
-    public string Name { get; set; }
+        public Task() { 
+            Id = Guid.NewGuid(); 
+        }
+        public string Name { get; set; }
         public int Duration { get; set; }
         public Guid SectionId { get; set; }
         public Section Section { get; set; }

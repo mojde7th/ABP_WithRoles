@@ -101,5 +101,12 @@ namespace TodoApp.Controllers
             var dailyPlans=await _accountAppService.GetAllDailyPlansAsync();
             return Ok(dailyPlans);
         }
+        [HttpPost("createFull")]
+        public async Task<IActionResult> CreateFullDailyPlanAsync
+            ([FromBody] CreateFullDailyplanDto input)
+        {
+            var result=await _accountAppService.CreateFullDailyPlanAsync(input);
+            return Ok(result);
+        }
     }
 }
