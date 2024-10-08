@@ -3,23 +3,25 @@ import { getAllDailyPlans } from '../services/dailyPlanService';
 import { Link } from 'react-router-dom';
 
 const DailyPlanList = () => {
-    const [dailyPlans, setDailyPlans] = useState([]);
-
+    const [plans, setPlans] = useState([]);
     useEffect(() => {
-        const fetchDailyPlans = async () => {
-            const response = await getAllDailyPlans();
-            setDailyPlans(response.data);
-        };
-        fetchDailyPlans();
+        getAllDailyPlans()
+            .then((response) => setPlans(response.data))
+            .catch((error) =>
+                console.error('Error fetching daily plans:', error)
+            );
     }, []);
 
     return (
         <div>
-            <h2>Daily Plans</h2>
+            <h1>Daily Plans</h1>
             <ul>
-                {dailyPlans.map((plan) => (
+                {plans.map((plan) => (
                     <li key={plan.id}>
-                        <Link to={`/dailyplans/${plan.id}`}>{plan.title}</Link>
+                        <Link to={`/dailyPlans/${plan.id}`}>
+                            {plan.title} - Created on:
+                            {plan.CreationTime}
+                        </Link>
                     </li>
                 ))}
             </ul>
