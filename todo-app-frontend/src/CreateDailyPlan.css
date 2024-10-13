@@ -1,0 +1,51 @@
+/* src/components/CreateDailyPlan.css */
+.create-daily-plan {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.section-form {
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+}
+
+.task-form, .layer-form {
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.totals-table {
+  margin-top: 20px;
+}
+
+.totals-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.totals-table th, .totals-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.totals-table th {
+  background-color: #f2f2f2;
+}

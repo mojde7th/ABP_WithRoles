@@ -40,3 +40,20 @@ ul {
 li {
   margin: 5px 0;
 }
+.task-box {
+  padding: 10px;
+  border: 1px solid black;
+  margin-bottom: 5px;
+}
+
+.layer-box {
+  padding: 10px;
+  border: 1px solid grey;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin-bottom: 5px;
+}
+
+.task-layer-container {
+  display: flex;
+  gap: 10px;
+}

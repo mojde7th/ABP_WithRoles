@@ -101,7 +101,7 @@ function App() {
                         element={<CreateDailyPlan />}
                     />
                     <Route
-                        path="/dailyplans/:id"
+                        path="/dailyplan/:id"
                         element={<DailyPlanDetail />}
                     />
                 </Routes>

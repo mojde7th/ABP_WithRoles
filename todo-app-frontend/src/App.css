@@ -1,38 +1,324 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* src/App.css */
+
+/* Container for the Daily Plan Detail */
+.daily-plan-detail {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Section Styling */
+.section {
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* Task and Layer Container */
+.task-layer-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Task Box Styling */
+.task-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #e0f7fa; /* Light blue */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Layer Box Styling */
+.layer-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: rgba(128, 128, 128, 0.3); /* Grey with 30% transparency */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Totals Table Styling */
+.totals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.totals-table th,
+.totals-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.totals-table th {
+    background-color: #f2f2f2;
+}
+/* src/App.css */
+
+/* Container for Create Daily Plan */
+.create-daily-plan {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Section Form Styling */
+.section-form {
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+}
+
+/* Task and Layer Form Styling */
+.task-form,
+.layer-form {
+    margin-bottom: 10px;
+}
+
+/* Task and Layer Container */
+.task-layer-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Task Box Styling */
+.task-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #e0f7fa; /* Light blue */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Layer Box Styling */
+.layer-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: rgba(128, 128, 128, 0.3); /* Grey with 30% transparency */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Totals Table Styling */
+.totals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.totals-table th,
+.totals-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.totals-table th {
+    background-color: #f2f2f2;
+}
+
+/* Current Sections Display */
+.current-sections {
+    margin-top: 40px;
+}
+
+.current-section {
+    margin-bottom: 20px;
+}
+
+/* Created Plan Display */
+.created-plan {
+    margin-top: 40px;
+}
+/* src/App.css */
+
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    color: #333;
+}
+
+/* Container for Create Daily Plan */
+.create-daily-plan,
+.daily-plan-detail {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+}
+
+/* Section Form Styling */
+.section-form {
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+}
+
+/* Task and Layer Form Styling */
+.task-form,
+.layer-form {
+    margin-bottom: 10px;
+}
+
+/* Labels and Inputs */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type='text'],
+input[type='number'] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Task and Layer Container */
+.task-layer-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Task Box Styling */
+.task-box {
+    flex: 1 1 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #e0f7fa; /* Light blue */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Layer Box Styling */
+.layer-box {
+    flex: 1 1 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: rgba(128, 128, 128, 0.3); /* Grey with 30% transparency */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Totals Table Styling */
+.totals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.totals-table th,
+.totals-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.totals-table th {
+    background-color: #f2f2f2;
+}
+
+/* Current Sections Display */
+.current-sections {
+    margin-top: 40px;
+}
+
+.current-section {
+    margin-bottom: 20px;
+}
+
+/* Created Plan Display */
+.created-plan {
+    margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .task-layer-container {
+        flex-direction: column;
+    }
+
+    .task-box,
+    .layer-box {
+        flex: 1 1 100%;
+    }
 }

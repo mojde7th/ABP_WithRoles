@@ -1,0 +1,55 @@
+/* src/components/DailyPlanDetail.css */
+.daily-plan-detail {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .section {
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .task-layer-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .task-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #e0f7fa;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .layer-box {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: rgba(128, 128, 128, 0.3);
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .totals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .totals-table th, .totals-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .totals-table th {
+    background-color: #f2f2f2;
+  }
+  

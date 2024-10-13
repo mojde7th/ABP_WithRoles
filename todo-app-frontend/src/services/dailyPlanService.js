@@ -20,3 +20,11 @@ return await axios.post(`${API_URL_Dail}/${planId}/sections`,section);
 export const addTaskToSection=async(sectionId,task)=>{
     return await axios.post(`${API_URL_Dail}/${sectionId}/tasks`,task);
 };
+
+export const createFullDailyPlan=async(dailyPlan)=>{
+    return await axios.post(`${API_URL_Dail}/createFull`,dailyPlan,
+        {
+            headers:{'Content-Type':'application/json'},
+        }
+    );
+};
